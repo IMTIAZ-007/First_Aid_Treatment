@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blood Bank Compatibility Checker | রক্তদান সামঞ্জস্য</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+    body {
+      font-family: 'Fira Code', monospace, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #c0c9d9;
+      min-height: 100vh;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Watermark behind content */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 400px;
+      height: 400px;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Blood_drop_icon.svg/1024px-Blood_drop_icon.svg.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.05;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.1));
+      animation: slow-spin 60s linear infinite;
+    }
+
+    @keyframes slow-spin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .container {
+      background: rgba(20, 29, 42, 0.9);
+      padding: 2.5rem 3rem;
+      border-radius: 16px;
+      box-shadow:
+        0 4px 20px rgba(0, 255, 255, 0.2),
+        0 0 30px rgba(0, 255, 255, 0.15) inset;
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      transition: box-shadow 0.4s ease;
+    }
+    .container:hover {
+      box-shadow:
+        0 8px 40px rgba(0, 255, 255, 0.5),
+        0 0 50px rgba(0, 255, 255, 0.3) inset;
+    }
+
+    h1 {
+      color: #2ee2f7;
+      font-weight: 900;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      user-select: none;
+      text-shadow: 0 0 10px #2ee2f7;
+      animation: fadeInDown 1s ease forwards;
+    }
+    h2 {
+      color: #6ee7ff;
+      font-weight: 700;
+      font-size: 1.9rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      user-select: none;
+      text-align: center;
+      text-shadow: 0 0 6px #6ee7ff88;
+      animation: fadeInUp 1.2s ease forwards;
+    }
+    label {
+      color: #a3b8cc;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      user-select: none;
+    }
+    select, button {
+      background-color: #18455f;
+      color: #c0c9d9;
+      border: none;
+      border-radius: 12px;
+      padding: 0.9rem 1.25rem;
+      font-size: 1.1rem;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      font-family: 'Fira Code', monospace;
+      box-shadow: 0 0 10px rgba(46, 226, 247, 0.3);
+    }
+    select:focus, button:hover {
+      background-color: #2ee2f7;
+      color: #062837;
+      outline: none;
+      box-shadow:
+        0 0 12px #2ee2f7,
+        0 0 25px #2ee2f7aa;
+      transition: all 0.3s ease;
+    }
+    .btn-check {
+      margin-top: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    #result {
+      margin-top: 1.5rem;
+      background: #133047;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      font-weight: 600;
+      color: #a3b8cc;
+      user-select: text;
+      box-shadow: inset 0 0 15px #2ee2f7aa;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #a3b8cc;
+      user-select: none;
+      box-shadow: 0 0 20px #2ee2f7aa inset;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #18455f;
+      padding: 0.9rem;
+      text-align: center;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    th {
+      background-color: #0f374f;
+      color: #72e0ff;
+      font-weight: 700;
+      text-shadow: 0 0 6px #72e0ffaa;
+    }
+    td {
+      background-color: #18455f;
+    }
+    td:hover {
+      background-color: #2ee2f7;
+      color: #062837;
+      font-weight: 700;
+      cursor: default;
+    }
+    .bangla {
+      font-family: 'Noto Sans Bengali', 'SolaimanLipi', 'Siyam Rupali', 'Arial', sans-serif;
+      font-weight: 600;
+      color: #8ad8ff;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .bangla:hover {
+      color: #2ee2f7;
+    }
+    .chart-container {
+      max-width: 450px;
+      margin: 2rem auto 0 auto;
+      user-select: none;
+      filter: drop-shadow(0 0 8px #2ee2f7aa);
+      animation: fadeInUp 1.5s ease forwards;
+    }
+    /* Animations */
+    @keyframes fadeInDown {
+      0% {opacity: 0; transform: translateY(-40px);}
+      100% {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes fadeInUp {
+      0% {opacity: 0; transform: translateY(40px);}
+      100% {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    #rotatingMessage {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1.3rem;
+      color: #72e0ff;
+      font-weight: 600;
+      font-style: italic;
+      user-select: none;
+      min-height: 48px;
+      transition: opacity 0.8s ease-in-out;
+      text-shadow: 0 0 8px #72e0ffcc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      Blood Bank Compatibility Checker<br />
+      <span class="bangla text-xl">রক্তদান সামঞ্জস্য যাচাই</span>
+    </h1>
+
+    <div id="rotatingMessage">রক্তদান মানব জীবনের উপকারিতা সম্পর্কে জানুন...</div>
+
+    <label for="bloodGroup" class="block mb-2">
+      <span>Select Patient Blood Group:</span>
+      <span class="bangla">রোগীর রক্তের গ্রুপ নির্বাচন করুন:</span>
+    </label>
+    <select id="bloodGroup" aria-label="Select Blood Group">
+      <option value="">-- Choose Blood Group -- | নির্বাচন করুন --</option>
+      <option value="A+">A+</option>
+      <option value="A-">A-</option>
+      <option value="B+">B+</option>
+      <option value="B-">B-</option>
+      <option value="AB+">AB+</option>
+      <option value="AB-">AB-</option>
+      <option value="O+">O+</option>
+      <option value="O-">O-</option>
+    </select>
+
+    <button class="btn-check" onclick="checkCompatibility()">Check Compatibility | সামঞ্জস্য পরীক্ষা করুন</button>
+
+    <div id="result"></div>
+
+    <div class="chart-container">
+      <canvas id="bloodChart"></canvas>
+    </div>
+
+    <h2>
+      Compatibility Table | সামঞ্জস্যের টেবিল
+    </h2>
+
+    <div style="overflow-x:auto;">
+      <table aria-label="Compatibility Table">
+        <thead>
+          <tr>
+            <th>Blood Group<br /><span class="bangla">রক্তের গ্রুপ</span></th>
+            <th>Can Donate To<br /><span class="bangla">দাতা হতে পারে</span></th>
+            <th>Can Receive From<br /><span class="bangla">গ্রহীতার হতে পারে</span></th>
+          </tr>
+        </thead>
+        <tbody id="compatTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const compatibility = {
+      "A+": { donate: ["A+", "AB+"], receive: ["A+", "A-", "O+", "O-"] },
+      "A-": { donate: ["A+", "A-", "AB+", "AB-"], receive: ["A-", "O-"] },
+      "B+": { donate: ["B+", "AB+"], receive: ["B+", "B-", "O+", "O-"] },
+      "B-": { donate: ["B+", "B-", "AB+", "AB-"], receive: ["B-", "O-"] },
+      "AB+": { donate: ["AB+"], receive: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] },
+      "AB-": { donate: ["AB+", "AB-"], receive: ["A-", "B-", "AB-", "O-"] },
+      "O+": { donate: ["A+", "B+", "AB+", "O+"], receive: ["O+", "O-"] },
+      "O-": { donate: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], receive: ["O-"] }
+    };
+
+    function checkCompatibility() {
+      const bg = document.getElementById('bloodGroup').value;
+      const result = document.getElementById('result');
+      const ctx = document.getElementById('bloodChart').getContext('2d');
+
+      if (!bg) {
+        result.innerHTML = "<span style='color:#7dd3fc; font-weight:700;'>Please select a blood group. | দয়া করে একটি রক্তের গ্রুপ নির্বাচন করুন।</span>";
+        return;
+      }
+
+      const data = compatibility[bg];
+      const donateList = data.donate.join(', ');
+      const receiveList = data.receive.join(', ');
+
+      result.innerHTML = `
+        <div>
+          <p><strong>Selected Blood Group | নির্বাচিত রক্তের গ্রুপ:</strong> ${bg}</p>
+          <p><strong>Can Donate To | দাতা হতে পারে:</strong> ${donateList}</p>
+          <p><strong>Can Receive From | গ্রহণ করতে পারে:</strong> ${receiveList}</p>
+        </div>
+      `;
+
+      if (window.bloodChart) {
+        window.bloodChart.destroy();
+      }
+
+      window.bloodChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Can Donate To | দাতা হতে পারে', 'Can Receive From | গ্রহণ করতে পারে'],
+          datasets: [{
+            label: 'Compatibility Count | সামঞ্জস্যের সংখ্যা',
+            data: [data.donate.length, data.receive.length],
+            backgroundColor: ['#38bdf8', '#22c55e']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Compatibility Overview | সামঞ্জস্যের সংক্ষিপ্তসার',
+              color: '#a5b4fc',
+              font: {
+                size: 18,
+                weight: 'bold'
+              }
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#a5b4fc'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Populate compatibility table on load
+    window.onload = () => {
+      const tbody = document.getElementById('compatTableBody');
+      tbody.innerHTML = '';
+      for (const bg in compatibility) {
+        const dList = compatibility[bg].donate.join(', ');
+        const rList = compatibility[bg].receive.join(', ');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${bg}</td>
+          <td>${dList}</td>
+          <td>${rList}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+      rotateMessages();
+    };
+
+    // Benefits messages in English and Bangla
+    const messages = [
+      "Donate blood, save lives! | রক্তদান করুন, জীবন বাঁচান!",
+      "One donation can help up to three people. | একবারের রক্তদান তিনজনের জীবন রক্ষা করতে পারে।",
+      "Blood donation improves your health and community. | রক্তদান আপনার স্বাস্থ্যের পাশাপাশি সমাজকেও উপকৃত করে।",
+      "Blood is needed every two seconds somewhere in the world. | বিশ্বের প্রতিটি দুই সেকেন্ডে রক্তের প্রয়োজন হয়।",
+      "Your blood can give someone a second chance at life. | আপনার রক্ত কারও জীবনে দ্বিতীয় সুযোগ দিতে পারে।"
+    ];
+
+    let msgIndex = 0;
+    const rotatingMessageElem = document.getElementById('rotatingMessage');
+
+    function rotateMessages() {
+      rotatingMessageElem.style.opacity = 0;
+      setTimeout(() => {
+        rotatingMessageElem.textContent = messages[msgIndex];
+        rotatingMessageElem.style.opacity = 1;
+        msgIndex = (msgIndex + 1) % messages.length;
+      }, 500);
+      setTimeout(rotateMessages, 5000);
+    }
+  </script>
+</body>
+</html>

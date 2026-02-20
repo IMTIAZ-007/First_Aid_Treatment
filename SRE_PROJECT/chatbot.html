@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>First Aid Chatbot - PhpStorm Style</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'JetBrains Mono', monospace;
+      background-color: #282c34;
+      color: #abb2bf;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      padding: 40px 20px;
+      user-select: none;
+    }
+
+    .chatbot {
+      background: #21252b;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      width: 480px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 40px 40px;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+    .chatbot:hover {
+      box-shadow: 0 12px 36px rgba(97, 175, 239, 0.7);
+    }
+
+    h1 {
+      color: #61dafb;
+      font-weight: 700;
+      font-size: 2rem;
+      margin: 0 0 25px;
+      text-align: center;
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 8px #61dafb99;
+      user-select: none;
+    }
+
+    .chatbox {
+      background: #2c313a;
+      border-radius: 10px;
+      box-shadow: inset 0 0 10px #1e2127;
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+      color: #abb2bf;
+      font-size: 1rem;
+      line-height: 1.4;
+      user-select: text;
+      scrollbar-width: thin;
+      scrollbar-color: #61dafb44 transparent;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    /* Scrollbar for Webkit browsers */
+    .chatbox::-webkit-scrollbar {
+      width: 8px;
+    }
+    .chatbox::-webkit-scrollbar-thumb {
+      background-color: #61dafb66;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .chatbox::-webkit-scrollbar-thumb:hover {
+      background-color: #21a1f188;
+    }
+    .chatbox::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px #0008;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .bot-message {
+      background-color: #3b4048;
+      color: #61dafb;
+      align-self: flex-start;
+      box-shadow: 0 0 15px #61dafb88;
+    }
+    .bot-message:hover {
+      background-color: #4f56a0;
+      box-shadow: 0 0 18px #4f56a099;
+    }
+
+    .user-message {
+      background-color: #3e462f;
+      color: #98c379;
+      align-self: flex-end;
+      box-shadow: 0 0 15px #98c37988;
+    }
+    .user-message:hover {
+      background-color: #4e5a3d;
+      box-shadow: 0 0 18px #4e5a3d99;
+    }
+
+    .icon {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke: currentColor;
+      fill: none;
+      user-select: none;
+      margin-top: 4px;
+    }
+
+    input[type="text"] {
+      border: none;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      background-color: #2c313a;
+      color: #abb2bf;
+      box-shadow: inset 0 0 8px #1e2127;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+      outline-offset: 2px;
+      outline-color: transparent;
+      outline-style: solid;
+      outline-width: 2px;
+      flex-grow: 1;
+      user-select: text;
+    }
+    input[type="text"]::placeholder {
+      color: #5c6370;
+      font-style: italic;
+    }
+    input[type="text"]:focus {
+      background-color: #20242d;
+      color: #61dafb;
+      box-shadow: 0 0 10px #61dafb;
+      outline-color: #61dafb;
+    }
+
+    button {
+      background-color: #61dafb;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 10px;
+      color: #282c34;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      box-shadow: 0 6px 14px #61dafb88;
+      user-select: none;
+      margin-left: 15px;
+      transition: 
+        background-color 0.25s ease,
+        box-shadow 0.25s ease,
+        color 0.25s ease,
+        transform 0.15s ease;
+    }
+    button:hover {
+      background-color: #21a1f1;
+      box-shadow: 0 10px 24px #21a1f188;
+      color: #e0e6f3;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 8px #21a1f144;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 0;
+      align-items: center;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="chatbot" role="main" aria-label="First Aid Chatbot">
+    <h1>First Aid Chatbot</h1>
+    <div class="chatbox" id="chatbox" aria-live="polite" aria-relevant="additions">
+      <div class="message bot-message">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+          <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Hello! How can I assist you with first aid today?
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Ask a question..." aria-label="Ask a question" />
+      <button onclick="getAnswer()" aria-label="Ask question">Ask</button>
+    </div>
+  </div>
+
+  <script>
+    async function getAnswer() {
+      const userInputEl = document.getElementById('userInput');
+      const userInput = userInputEl.value.trim();
+      if(!userInput) return;
+
+      const chatbox = document.getElementById('chatbox');
+
+      // Add user message
+      const userMsg = document.createElement('div');
+      userMsg.classList.add('message', 'user-message');
+      userMsg.innerHTML = `
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+        </svg>
+        ${escapeHtml(userInput)}
+      `;
+      chatbox.appendChild(userMsg);
+
+      // Fetch FAQs from backend
+      try {
+        const response = await fetch('http://localhost:3000/api/faqs');
+        const faqs = await response.json();
+
+        // Find matching FAQ (case insensitive substring)
+        const matchedFaq = faqs.find(faq => faq.question.toLowerCase().includes(userInput.toLowerCase()));
+
+        const botMsg = document.createElement('div');
+        botMsg.classList.add('message', 'bot-message');
+        botMsg.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+            <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          ${escapeHtml(matchedFaq ? matchedFaq.answer : "Sorry, I don't understand that question.")}
+        `;
+        chatbox.appendChild(botMsg);
+      } catch (error) {
+        const botMsg = document.createElement('div');
+        botMsg.classList.add('message', 'bot-message');
+        botMsg.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+            <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Sorry, I am having trouble fetching answers right now.
+        `;
+        chatbox.appendChild(botMsg);
+      }
+
+      // Scroll chatbox to bottom
+      chatbox.scrollTop = chatbox.scrollHeight;
+      userInputEl.value = '';
+      userInputEl.focus();
+    }
+
+    // Escape HTML to prevent injection
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m];
+      });
+    }
+
+  </script>
+</body>
+</html>

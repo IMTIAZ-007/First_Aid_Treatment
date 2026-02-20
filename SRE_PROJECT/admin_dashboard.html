@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Professional Admin Dashboard</title>
+  
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    /* Color palette based on PhpStorm dark theme */
+    :root {
+      --bg-dark: #1e1e2f;
+      --bg-darker: #161622;
+      --bg-sidebar: #252536;
+      --bg-accent: #2a2a44;
+      --text-primary: #c9d1d9;
+      --text-muted: #7f848e;
+      --highlight-pink: #ff007f;
+      --highlight-purple: #9b4dff;
+      --highlight-blue: #0076ff;
+      --shadow-dark: rgba(0,0,0,0.75);
+    }
+
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+      background: linear-gradient(135deg, var(--bg-dark), var(--bg-darker));
+      color: var(--text-primary);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Watermark background */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 420px;
+      height: 420px;
+      background: url('https://cdn-icons-png.flaticon.com/512/2917/2917242.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.03;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      filter: grayscale(100%);
+    }
+
+    /* Main layout */
+    .dashboard {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background-color: var(--bg-sidebar);
+      width: 260px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      box-shadow: 2px 0 10px var(--shadow-dark);
+      transition: width 0.3s ease;
+      position: relative;
+      z-index: 10;
+    }
+    .sidebar.collapsed {
+      width: 70px;
+      min-width: 70px;
+    }
+
+    /* Sidebar Logo */
+    .sidebar .logo {
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--highlight-purple);
+      margin-bottom: 40px;
+      user-select: text;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar.collapsed .logo {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      margin: 0;
+    }
+
+    /* Sidebar nav links */
+    .nav-links {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 12px 15px;
+      border-radius: 10px;
+      transition: background 0.3s ease, color 0.3s ease;
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: white;
+      background: linear-gradient(135deg, var(--highlight-pink), var(--highlight-purple));
+      box-shadow: 0 4px 15px var(--shadow-dark);
+    }
+    .nav-link i {
+      min-width: 25px;
+      text-align: center;
+      font-size: 1.3rem;
+      color: var(--highlight-purple);
+      transition: color 0.3s ease;
+    }
+    .nav-link:hover i, .nav-link.active i {
+      color: white;
+    }
+
+    /* Collapse button */
+    .collapse-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 10px;
+      margin-top: auto;
+      transition: color 0.3s ease;
+    }
+    .collapse-btn:hover {
+      color: var(--highlight-purple);
+    }
+
+    /* Main content */
+    .main-content {
+      flex-grow: 1;
+      background-color: var(--bg-accent);
+      padding: 40px 60px;
+      overflow-y: auto;
+      position: relative;
+      user-select: text;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 15px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .header img {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--highlight-purple);
+      object-fit: cover;
+    }
+    .header span {
+      color: var(--text-primary);
+      user-select: text;
+    }
+
+    /* Cards container */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    /* Individual cards */
+    .card {
+      background: var(--bg-dark);
+      border-radius: 15px;
+      padding: 30px 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+      background: linear-gradient(135deg, var(--highlight-pink), var(--highlight-purple));
+      color: white;
+    }
+
+    /* Card heading with icon */
+    .card h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      margin: 0 0 18px;
+      font-weight: 700;
+      user-select: text;
+    }
+    .card h3 i {
+      font-size: 2rem;
+      color: var(--highlight-purple);
+      transition: color 0.3s ease;
+    }
+    .card:hover h3 i {
+      color: white;
+    }
+
+    /* Card description */
+    .card p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: #ddd;
+      margin-bottom: 25px;
+      user-select: text;
+    }
+
+    /* Card button/link */
+    .card a {
+      text-align: center;
+      padding: 15px 30px;
+      background: var(--highlight-purple);
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 1.1rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      transition: background 0.3s ease, transform 0.3s ease;
+      user-select: none;
+    }
+    .card a:hover {
+      background: var(--highlight-pink);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+        min-width: 60px;
+      }
+      .sidebar .logo {
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        pointer-events: none;
+      }
+      .nav-link {
+        font-size: 0;
+        justify-content: center;
+      }
+      .nav-link span {
+        display: none;
+      }
+      .main-content {
+        padding: 20px;
+      }
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard" role="main">
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar" aria-label="Sidebar Navigation">
+      <div class="logo" aria-label="Admin Logo">AdminPanel</div>
+
+      <div class="nav-links" role="list">
+        <div class="nav-link active" role="listitem" tabindex="0" aria-current="page">
+          <i class="fa-solid fa-briefcase-medical"></i>
+          <span>Add Treatment</span>
+        </div>
+        <div class="nav-link" role="listitem" tabindex="0">
+          <i class="fa-solid fa-capsules"></i>
+          <span>Add Medicine</span>
+        </div>
+        <div class="nav-link" role="listitem" tabindex="0">
+          <i class="fa-solid fa-vials"></i>
+          <span>Add Lab Test</span>
+        </div>
+      </div>
+
+      <button class="collapse-btn" aria-label="Toggle Sidebar" id="toggleSidebar" title="Toggle Sidebar">
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+    </nav>
+
+    <!-- Main content -->
+    <section class="main-content" tabindex="0">
+
+      <!-- Header -->
+      <header class="header" role="banner">
+        <span>Welcome,</span>
+        <img src="https://i.pravatar.cc/40?img=12" alt="Admin Avatar" />
+        <span><strong>Admin User</strong></span>
+      </header>
+
+      <!-- Cards -->
+      <div class="cards" role="list">
+        <article class="card" role="listitem" tabindex="0" aria-label="Add Treatment Section">
+          <h3><i class="fa-solid fa-plus-medical"></i> Add Treatment</h3>
+          <p>Add and manage medical treatments efficiently with simple options.</p>
+          <a href="add_treatment.html" aria-label="Go to Add Treatment">Go to Add Treatment</a>
+        </article>
+
+        <article class="card" role="listitem" tabindex="0" aria-label="Add Medicine Section">
+          <h3><i class="fa-solid fa-pills"></i> Add Medicine</h3>
+          <p>Add and manage medicines, dosage, and instructions easily.</p>
+          <a href="add_medicine.html" aria-label="Go to Add Medicine">Go to Add Medicine</a>
+        </article>
+
+        <article class="card" role="listitem" tabindex="0" aria-label="Add Lab Test Section">
+          <h3><i class="fa-solid fa-vials"></i> Add Lab Test</h3>
+          <p>Add and manage lab tests and reports with ease.</p>
+          <a href="lab_test.html" aria-label="Go to Add Lab Test">Go to Add Lab Test</a>
+        </article>
+
+         <article class="card" role="listitem" tabindex="0" aria-label="Add Lab Test Section">
+          <h3><i class="fa-solid fa-vials"></i> Show Ratings</h3>
+          <p>This will show the review and ratings.</p>
+          <a href="test.html" aria-label="Go to Add Lab Test">Go to See Ratings</a>
+        </article>
+      </div>
+
+    </section>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      const icon = toggleBtn.querySelector('i');
+      if (sidebar.classList.contains('collapsed')) {
+        icon.classList.remove('fa-angle-left');
+        icon.classList.add('fa-angle-right');
+      } else {
+        icon.classList.remove('fa-angle-right');
+        icon.classList.add('fa-angle-left');
+      }
+    });
+
+    // Accessibility: add keyboard navigation for sidebar links
+    const navLinks = sidebar.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+      link.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          link.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

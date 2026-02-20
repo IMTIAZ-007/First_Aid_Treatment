@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All Lab Tests - PhpStorm Theme</title>
+
+  <!-- FontAwesome CDN for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pOtdbtA5U+1dr8nrhFDYB2zzmGLfX8ybTGnOVO6+RJ1gZzxSPy2XBTRuyTkfPfZ7fKjP6EsTzTfMZZwYB6lF3g=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    /* PhpStorm-like dark theme colors */
+    :root {
+      --background: #2b2b2b;
+      --background-alt: #313335;
+      --accent: #519aba; /* PhpStorm blue accent */
+      --accent-light: #6cb6ff;
+      --text-primary: #a9b7c6;
+      --text-secondary: #606366;
+      --shadow: rgba(0, 0, 0, 0.7);
+      --hover-shadow: rgba(81, 154, 186, 0.7);
+    }
+
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+      background: var(--background);
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+      position: relative;
+      user-select: none;
+      overflow-x: hidden;
+    }
+
+    /* Watermark behind content */
+    body::before {
+      content: "PhpStorm";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 12rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      letter-spacing: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .content {
+      position: relative;
+      max-width: 1000px;
+      width: 100%;
+      background-color: var(--background-alt);
+      padding: 40px 50px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px var(--shadow);
+      z-index: 1;
+      user-select: text;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--accent-light);
+      text-shadow: 0 0 8px var(--accent-light);
+      letter-spacing: 3px;
+      user-select: text;
+    }
+
+    /* Search input */
+    #searchInput {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      border: 1px solid var(--text-secondary);
+      background-color: var(--background);
+      color: var(--text-primary);
+      transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        background-color 0.3s ease;
+      margin-bottom: 30px;
+      outline-offset: 2px;
+      user-select: text;
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    #searchInput:focus {
+      border-color: var(--accent);
+      background-color: #22272e;
+      box-shadow: 0 0 10px var(--accent);
+      color: white;
+    }
+
+    /* Grid layout for lab tests */
+    .lab-tests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    /* Individual card */
+    .lab-test-card {
+      background-color: var(--background);
+      border: 1px solid var(--text-secondary);
+      border-radius: 10px;
+      padding: 25px 30px;
+      box-shadow: 0 2px 10px var(--shadow);
+      transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.25s ease;
+      cursor: default;
+      user-select: text;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lab-test-card:hover,
+    .lab-test-card:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 8px 20px var(--hover-shadow);
+      transform: translateY(-6px);
+      outline: none;
+      z-index: 2;
+    }
+
+    /* Test Name with icon */
+    .lab-test-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: text;
+    }
+    .lab-test-name i {
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    /* Description */
+    .lab-test-desc {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      min-height: 56px;
+      user-select: text;
+    }
+
+    /* Price with icon */
+    .lab-test-price {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--accent);
+      text-align: right;
+      user-select: text;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+    }
+    .lab-test-price i {
+      color: var(--accent-light);
+      font-size: 1.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .content {
+        padding: 30px 25px;
+      }
+      h1 {
+        font-size: 2.4rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .lab-test-price {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="content" role="main" aria-label="All Lab Tests">
+    <h1>All Lab Tests</h1>
+
+    <input
+      type="search"
+      id="searchInput"
+      placeholder="Search lab tests by name or description..."
+      aria-label="Search lab tests"
+      autocomplete="off"
+    />
+
+    <div class="lab-tests-grid" id="labTestsGrid" aria-live="polite" aria-atomic="true">
+      <!-- Lab test cards go here -->
+    </div>
+  </div>
+
+  <script>
+    const apiBase = 'http://localhost:3000'; // Change if needed
+    let allLabTests = [];
+
+    function renderLabTests(tests) {
+      const container = document.getElementById('labTestsGrid');
+      container.innerHTML = '';
+      if (tests.length === 0) {
+        container.innerHTML = `<p style="color:#bbb; text-align:center; width:100%;">No lab tests match your search.</p>`;
+        return;
+      }
+      tests.forEach(({ name, description, price }) => {
+        const card = document.createElement('article');
+        card.className = 'lab-test-card';
+        card.setAttribute('tabindex', '0'); // keyboard focus for accessibility
+        card.innerHTML = `
+          <h2 class="lab-test-name"><i class="fas fa-vial"></i> ${name}</h2>
+          <p class="lab-test-desc">${description || 'No description available.'}</p>
+          <p class="lab-test-price"><i class="fas fa-bangladeshi-taka-sign"></i> ${price !== undefined && price !== null ? price : 'N/A'}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function loadLabTests() {
+      fetch(`${apiBase}/get-lab-tests`)
+        .then(res => res.json())
+        .then(data => {
+          allLabTests = data;
+          renderLabTests(allLabTests);
+        })
+        .catch(err => {
+          const container = document.getElementById('labTestsGrid');
+          container.innerHTML = `<p style="color:#f88; text-align:center; width:100%;">Failed to fetch lab tests. Please try again later.</p>`;
+          console.error(err);
+        });
+    }
+
+    // Filter tests based on search input
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+      if (!query) {
+        renderLabTests(allLabTests);
+        return;
+      }
+      const filtered = allLabTests.filter(({ name, description }) =>
+        name.toLowerCase().includes(query) ||
+        (description && description.toLowerCase().includes(query))
+      );
+      renderLabTests(filtered);
+    });
+
+    loadLabTests();
+  </script>
+</body>
+</html>

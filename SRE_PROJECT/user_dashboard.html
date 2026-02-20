@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Dashboard </title>
+
+  <!-- JetBrains Mono Font -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      height: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      background: #1e1e2f;
+      color: #c6c8d1;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar styling with PHPStorm colors */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      background: linear-gradient(180deg, #252535, #1b1b2f);
+      border-right: 1px solid #2a2a4d;
+      box-shadow: inset -4px 0 6px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      padding-top: 30px;
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+
+    .sidebar:hover {
+      width: 280px;
+      box-shadow: inset -6px 0 8px rgba(0,0,0,0.9);
+    }
+
+    /* Profile box with glow */
+    .profile-box {
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 25px;
+      transition: background-color 0.3s ease;
+      border-radius: 8px;
+      margin-left: 15px;
+      margin-right: 15px;
+      box-shadow: 0 0 8px #61dafb55;
+    }
+
+    .profile-box:hover {
+      background-color: #313151;
+      box-shadow: 0 0 14px #61dafbaa;
+    }
+
+    .profile-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid #61dafb;
+      margin-right: 15px;
+      filter: drop-shadow(0 0 3px #61dafbaa);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-box:hover .profile-img {
+      transform: scale(1.1);
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #a6a8b7;
+      font-size: 13px;
+      line-height: 1.2;
+      user-select: none;
+    }
+
+    .profile-info strong {
+      font-size: 17px;
+      color: #61dafb;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Sidebar Title */
+    .sidebar-title {
+      color: #61dafb;
+      text-align: center;
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 0.06em;
+      margin-bottom: 25px;
+      text-shadow: 0 0 6px #61dafbaa;
+      user-select: none;
+    }
+
+    /* Navigation List */
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 15px;
+      flex-grow: 1;
+    }
+
+    .nav-item {
+      margin-bottom: 6px;
+    }
+
+    /* Nav link style */
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 18px;
+      font-size: 15px;
+      color: #8a8ca6;
+      text-decoration: none;
+      border-left: 4px solid transparent;
+      border-radius: 6px;
+      transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.3s ease;
+      user-select: none;
+      box-shadow: inset 0 0 0 transparent;
+    }
+
+    .nav-link:hover {
+      background-color: #313151;
+      color: #61dafb;
+      border-left-color: #61dafb;
+      box-shadow: 0 0 6px #61dafbaa;
+    }
+
+    .nav-link.active {
+      background-color: #1e8cff33;
+      color: #61dafb;
+      border-left-color: #61dafb;
+      font-weight: 700;
+      box-shadow: 0 0 8px #61dafbaa;
+    }
+
+    /* Icons inside nav (using inline SVG) */
+    .nav-link svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      transition: fill 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    /* Content area */
+    .content {
+      margin-left: 260px;
+      padding: 40px 60px;
+      min-height: 100vh;
+      position: relative;
+      background: #282a3b;
+      overflow-y: auto;
+      transition: margin-left 0.3s ease;
+    }
+
+    .nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: calc(100vh - 160px); /* adjust height based on header/profile */
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #61dafb transparent; /* Firefox */
+}
+
+/* Webkit browsers scrollbar styling */
+.nav-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nav-list::-webkit-scrollbar-thumb {
+  background-color: #61dafb;
+  border-radius: 3px;
+}
+
+.nav-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+    /* Watermark behind content */
+    .content::before {
+      content: "PHPStorm";
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 10vw;
+      font-weight: 900;
+      color: rgba(97, 218, 251, 0.07);
+      user-select: none;
+      pointer-events: none;
+      z-index: 0;
+      letter-spacing: 0.15em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Content titles and text */
+    .dashboard-title {
+      color: #61dafb;
+      font-weight: 700;
+      font-size: 2.4rem;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 1;
+      user-select: none;
+    }
+
+    #welcomeText {
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+      color: #a6a8b7;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Health Tips Section */
+    #healthTipsSection {
+      position: relative;
+      margin-bottom: 50px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    #healthTipsSection h2 {
+      color: #61dafb;
+      margin-bottom: 25px;
+      text-shadow: 0 0 6px #61dafbaa;
+      user-select: none;
+    }
+
+    #healthTips {
+      background-color: #1e1f2d;
+      padding: 22px 25px;
+      border-radius: 10px;
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 20px;
+      color: #c6c8d1;
+      box-shadow: 0 0 10px #61dafbaa;
+      min-height: 90px;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      user-select: text;
+    }
+
+    #healthTips.visible {
+      opacity: 1;
+    }
+
+    /* Doctors Section */
+    #doctorsSection {
+      background: #1e1f2d;
+      max-width: 800px;
+      margin: 0 auto 60px auto;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(97, 218, 251, 0.3);
+      color: #a6a8b7;
+      z-index: 1;
+      position: relative;
+      user-select: none;
+    }
+
+    #doctorsSection h2 {
+      color: #61dafb;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-shadow: 0 0 6px #61dafbaa;
+      user-select: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      background-color: #2a2c40;
+      color: #c6c8d1;
+      box-shadow: inset 0 0 6px #00000088;
+      transition: box-shadow 0.3s ease;
+      user-select: text;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      box-shadow: inset 0 0 12px #61dafbaa;
+      background-color: #1c1e30;
+      color: #61dafb;
+    }
+
+    /* Doctors List */
+    #doctorsList {
+      max-height: 320px;
+      overflow-y: auto;
+      border-radius: 10px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      box-shadow: inset 0 0 15px #000000cc;
+      user-select: text;
+      border: 1px solid #2a2c40;
+      background: #282a3b;
+    }
+
+    #doctorsList li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid #383a51;
+      transition: background-color 0.3s ease;
+      cursor: default;
+    }
+
+    #doctorsList li:last-child {
+      border-bottom: none;
+    }
+
+    #doctorsList li:hover {
+      background-color: #313151;
+      box-shadow: inset 0 0 8px #61dafbaa;
+    }
+
+    #doctorsList li span.name {
+      font-weight: 700;
+      font-size: 16px;
+      color: #61dafb;
+      min-width: 180px;
+      user-select: text;
+    }
+
+    #doctorsList li span.specialty {
+      font-style: italic;
+      color: #a6a8b7;
+      margin-left: 15px;
+      flex-grow: 1;
+      user-select: text;
+    }
+
+    #doctorsList li span.phone {
+      font-weight: 600;
+      color: #a6a8b7;
+      margin-left: 15px;
+      white-space: nowrap;
+      user-select: text;
+    }
+
+    /* Logout link distinct */
+    .nav-item:last-child .nav-link {
+      color: #ff5370;
+      font-weight: 700;
+      border-left-color: transparent;
+    }
+    .nav-item:last-child .nav-link:hover {
+      color: #ff869a;
+      background-color: #411821;
+      border-left-color: #ff5370;
+      box-shadow: 0 0 8px #ff5370aa;
+    }
+
+    /* Scrollbar styling for doctor list */
+    #doctorsList::-webkit-scrollbar {
+      width: 9px;
+    }
+    #doctorsList::-webkit-scrollbar-track {
+      background: #1e1f2d;
+    }
+    #doctorsList::-webkit-scrollbar-thumb {
+      background: #61dafb88;
+      border-radius: 6px;
+    }
+
+    /* Responsive for smaller devices */
+    @media (max-width: 720px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        padding: 0 15px;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        border-right: none;
+      }
+
+      .profile-box {
+        display: none;
+      }
+
+      .sidebar-title {
+        flex-grow: 1;
+        font-size: 20px;
+        text-align: left;
+        margin-bottom: 0;
+      }
+
+      .nav-list {
+        display: flex;
+        flex-direction: row;
+        margin: 0;
+        padding: 0;
+        overflow-x: auto;
+      }
+
+      .nav-item {
+        margin: 0 10px;
+      }
+
+      .nav-link {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .content {
+  margin-left: 260px;
+  padding: 40px 60px;
+  min-height: 100vh;
+  position: relative;
+  background: #282a3b;
+  overflow-y: auto;  /* good */
+  transition: margin-left 0.3s ease;
+}
+html, body {
+  height: 100%;
+  overflow-y: auto;
+}
+
+      .content {
+        margin-left: 0;
+        padding: 20px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" aria-label="Sidebar Navigation">
+    <div class="profile-box" onclick="window.location.href='user_profile.html'" title="User Profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile" class="profile-img" />
+      <div class="profile-info" aria-live="polite">
+        <strong id="studentName">John Doe</strong>
+        <span id="studentID">ID: STU12345</span>
+      </div>
+    </div>
+
+    <h2 class="sidebar-title">User Panel</h2>
+
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a href="user_dashboard.html" class="nav-link active" title="Dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"></path>
+          </svg>
+          Dashboard
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="treatments.html" class="nav-link" title="Show Treatments">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 14l5-5 5 5H7z"></path>
+            <path d="M7 10h10v4H7z" opacity=".3"></path>
+          </svg>
+          Show Treatments
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="medicines.html" class="nav-link" title="Show Medicines">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9c0 3.64 2.05 6.81 5 8.45V21h8v-.55c2.95-1.64 5-4.81 5-8.45z"></path>
+            <path d="M12 7v10h-1v-7H9v-3h3z" opacity=".3"></path>
+          </svg>
+          Show Medicines
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="bmi.html" class="nav-link" title="BMI Calculator">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z"></path>
+          </svg>
+          BMI Calculator
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="chatbot_online.html" class="nav-link" title="Online Helpline">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"></path>
+          </svg>
+          Online Helpline
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="chatbot.html" class="nav-link" title="Offline Helpline">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2a10 10 0 00-7.07 17.07l-2.83 2.83 1.41 1.41 2.83-2.83A10 10 0 1012 2z"></path>
+          </svg>
+          Offline Helpline
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="nearby.html" class="nav-link" title="Nearby Hospitals & Ambulance Services">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-4H7v-2h4V7h2v4h4v2h-4v4z"></path>
+          </svg>
+          Nearby Hospitals & Ambulance Services
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="quickcheck.html" class="nav-link" title="Quick Checkup">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9 16h6v-2H9v2zm0-6h6v2H9v-2zm7.7-4.29l-5 5a1 1 0 01-1.4 0l-3-3 1.4-1.4 2.3 2.3 4.3-4.3 1.4 1.4z"></path>
+          </svg>
+          Quick Checkup
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="showlab.html" class="nav-link" title="Show Lab Test Details">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 2h12v20H6V2zm2 4h8v2H8V6z"></path>
+          </svg>
+          Show Lab Test Details
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="smart.html" class="nav-link" title="Smart Health Monitor">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 2h12v20H6V2zm2 4h8v2H8V6z"></path>
+          </svg>
+          Smart Health Monitor
+        </a>
+      </li>
+
+
+       <li class="nav-item">
+        <a href="blood.html" class="nav-link" title="Blood Bank Compatibility">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 2h12v20H6V2zm2 4h8v2H8V6z"></path>
+          </svg>
+          Blood Bank Compatibility
+        </a>
+      </li>
+
+
+      <li class="nav-item">
+        <a href="food.html" class="nav-link" title="Food and Nutrition">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 2h12v20H6V2zm2 4h8v2H8V6z"></path>
+          </svg>
+          Food and Nutrition
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="logout()" title="Logout">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3h-8v2h8v14h-8v2h8a2 2 0 002-2V5a2 2 0 00-2-2z"></path>
+          </svg>
+          Logout
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="content" role="main" tabindex="-1">
+    <h1 class="dashboard-title" aria-live="polite">User Dashboard</h1>
+    <p id="welcomeText" aria-live="polite">Welcome back!</p>
+
+    <!-- Health Tips Section -->
+    <section id="healthTipsSection" aria-label="Health Tips Section">
+      <h2>🩺 Health Tips / Daily Advice</h2>
+      <div id="healthTips" aria-live="polite" aria-atomic="true">Loading health tip...</div>
+    </section>
+
+    <!-- Doctor Contact Section -->
+    <section id="doctorsSection" aria-label="Doctors Contacts and Specialties">
+      <h2>📞 Doctors Contacts & Specialties</h2>
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Search by name or specialty..."
+        aria-label="Search doctors by name or specialty"
+      />
+      <ul id="doctorsList" role="list"></ul>
+    </section>
+  </main>
+
+  <script>
+    // Health Tips array
+    const healthTips = [
+      "Drink plenty of water daily to stay hydrated.",
+      "Take short breaks during study sessions to improve focus.",
+      "Include fruits and vegetables in your diet for better health.",
+      "Maintain a regular sleep schedule for optimal rest.",
+      "Practice deep breathing to reduce stress and anxiety.",
+      "Engage in at least 30 minutes of physical activity daily.",
+      "Wash your hands frequently to prevent infections.",
+      "Limit screen time to reduce eye strain.",
+      "Keep your study space clean and organized.",
+      "Remember to stretch regularly to avoid stiffness."
+    ];
+
+    const healthTipsDiv = document.getElementById('healthTips');
+    let tipIndex = 0;
+
+    function showTip(index) {
+      healthTipsDiv.classList.remove('visible');
+      setTimeout(() => {
+        healthTipsDiv.textContent = healthTips[index];
+        healthTipsDiv.classList.add('visible');
+      }, 500);
+    }
+
+    showTip(tipIndex);
+    setInterval(() => {
+      tipIndex = (tipIndex + 1) % healthTips.length;
+      showTip(tipIndex);
+    }, 15000);
+
+    // Load student data from localStorage
+    const student = JSON.parse(localStorage.getItem('student'));
+    if (!student) {
+      alert("You must log in first.");
+      window.location.href = 'user_login.html';
+    } else {
+      document.getElementById('studentName').textContent = student.name;
+      document.getElementById('studentID').textContent = "ID: " + student.id;
+      document.getElementById('welcomeText').textContent = `Welcome back, ${student.name}!`;
+    }
+
+    function logout() {
+      localStorage.removeItem('student');
+      window.location.href = 'user_login.html';
+    }
+
+    // Doctors data array
+    const doctors = [
+      { name: "Dr. Rumana Hossain", specialty: "Chiropractor", phone: "+880 9682 438104" },
+      { name: "Dr. Tanvir Siddiqui", specialty: "Psychiatrist", phone: "+880 4297 139475" },
+      { name: "Dr. Tania Chowdhury", specialty: "Orthopedic Surgeon", phone: "+880 7731 178982" },
+      { name: "Dr. Rumana Chowdhury", specialty: "Rheumatologist", phone: "+880 9847 405612" },
+      { name: "Dr. Rafiq Chowdhury", specialty: "Dermatologist", phone: "+880 6737 376981" },
+      { name: "Dr. Farzana Siddiqui", specialty: "Gynecologist", phone: "+880 7589 580722" },
+      { name: "Dr. Imran Rahman", specialty: "Cardiologist", phone: "+880 5467 940019" },
+      { name: "Dr. Monirul Rahman", specialty: "Oncologist", phone: "+880 7767 624251" },
+      { name: "Dr. Tanvir Rahman", specialty: "Urologist", phone: "+880 7552 922612" },
+      { name: "Dr. Javed Khan", specialty: "General Surgeon", phone: "+880 6481 769271" },
+      { name: "Dr. Arif Mahmud", specialty: "Ophthalmologist", phone: "+880 8801 133945" },
+      { name: "Dr. Jasmine Ahmed", specialty: "Neurologist", phone: "+880 9543 269016" },
+      { name: "Dr. Mahmud Hasan", specialty: "Psychiatrist", phone: "+880 7356 375528" },
+      { name: "Dr. Ahsan Jahan", specialty: "Pulmonologist", phone: "+880 3267 306118" },
+      { name: "Dr. Nusrat Mahmud", specialty: "Endocrinologist", phone: "+880 6971 303282" },
+      { name: "Dr. Farhana Chowdhury", specialty: "Allergist", phone: "+880 9646 116280" },
+      { name: "Dr. Nazmul Siddiqui", specialty: "Immunologist", phone: "+880 8605 926142" },
+      { name: "Dr. Sharmin Siddiqui", specialty: "Anesthesiologist", phone: "+880 8629 288476" },
+      { name: "Dr. Sultana Hossain", specialty: "Pediatrician", phone: "+880 3117 173152" },
+      { name: "Dr. Tanvir Uddin", specialty: "Gastroenterologist", phone: "+880 4355 110287" },
+      { name: "Dr. Jasmine Uddin", specialty: "Hematologist", phone: "+880 3455 598292" },
+      { name: "Dr. Saiful Siddiqui", specialty: "Obstetrician", phone: "+880 8820 933110" },
+      { name: "Dr. Fahim Hasan", specialty: "Dentist", phone: "+880 2842 386007" },
+      { name: "Dr. Tania Hasan", specialty: "Endodontist", phone: "+880 7515 771114" },
+      { name: "Dr. Rumana Mahmud", specialty: "Nephrologist", phone: "+880 7415 417101" },
+      { name: "Dr. Omar Faruq", specialty: "Nutritionist", phone: "+880 6300 309141" },
+      { name: "Dr. Mahmudul Islam", specialty: "Pathologist", phone: "+880 2122 872477" },
+      { name: "Dr. Nilufa Begum", specialty: "Physiotherapist", phone: "+880 4731 907970" },
+      { name: "Dr. Tania Rahman", specialty: "General Surgeon", phone: "+880 8996 813574" },
+      { name: "Dr. Saiful Islam", specialty: "Pulmonologist", phone: "+880 8014 489869" },
+      { name: "Dr. Kamrun Nahar", specialty: "Cardiologist", phone: "+880 3184 218594" },
+      { name: "Dr. Javed Islam", specialty: "Dermatologist", phone: "+880 4227 728025" },
+      { name: "Dr. Salma Akter", specialty: "Urologist", phone: "+880 2101 733087" },
+      { name: "Dr. Tanvir Mahmud", specialty: "ENT Specialist", phone: "+880 7962 654226" },
+      { name: "Dr. Nazia Siddique", specialty: "Ophthalmologist", phone: "+880 3923 273404" },
+      { name: "Dr. Zahid Hasan", specialty: "Rheumatologist", phone: "+880 6662 121540" },
+      { name: "Dr. Amina Akter", specialty: "Dentist", phone: "+880 6443 227882" },
+      { name: "Dr. Fahim Rahman", specialty: "Gynecologist", phone: "+880 9642 479469" },
+      { name: "Dr. Sultana Begum", specialty: "Neurologist", phone: "+880 6675 312248" },
+      { name: "Dr. Kamal Uddin", specialty: "Allergist", phone: "+880 3024 356408" },
+      { name: "Dr. Rafiq Ahmed", specialty: "Pathologist", phone: "+880 7116 351430" },
+      { name: "Dr. Meherun Nahar", specialty: "Psychiatrist", phone: "+880 4376 408113" },
+      { name: "Dr. Farhan Siddiqui", specialty: "Nephrologist", phone: "+880 4448 681989" },
+      { name: "Dr. Nusrat Jahan", specialty: "Pulmonologist", phone: "+880 3449 684722" },
+      { name: "Dr. Omar Sani", specialty: "Gastroenterologist", phone: "+880 7856 392620" },
+      { name: "Dr. Mahmud Khan", specialty: "Orthopedic Surgeon", phone: "+880 8262 226728" },
+      { name: "Dr. Ahsan Rahman", specialty: "Cardiologist", phone: "+880 3280 826053" },
+      { name: "Dr. Zahid Chowdhury", specialty: "Neurologist", phone: "+880 9233 735005" },
+      { name: "Dr. Nilufa Khatun", specialty: "Oncologist", phone: "+880 5886 904159" },
+      { name: "Dr. Laila Mahmud", specialty: "Immunologist", phone: "+880 2797 101273" },
+      { name: "Dr. Mahmud Islam", specialty: "Anesthesiologist", phone: "+880 7191 694616" },
+      { name: "Dr. Rumana Islam", specialty: "Physiotherapist", phone: "+880 8415 453251" },
+      { name: "Dr. Tanvir Hasan", specialty: "Dentist", phone: "+880 3636 449179" },
+      { name: "Dr. Monirul Islam", specialty: "Nutritionist", phone: "+880 5030 184493" },
+      { name: "Dr. Sharmin Akhter", specialty: "Ophthalmologist", phone: "+880 8943 511383" },
+      { name: "Dr. Tania Akhter", specialty: "Obstetrician", phone: "+880 3930 924489" },
+      { name: "Dr. Saiful Hossain", specialty: "ENT Specialist", phone: "+880 9317 143973" },
+      { name: "Dr. Rasheda Parveen", specialty: "Hematologist", phone: "+880 5803 826400" },
+      { name: "Dr. Mahmud Chowdhury", specialty: "Endodontist", phone: "+880 3954 127631" },
+      { name: "Dr. Jasmine Karim", specialty: "Allergist", phone: "+880 1427 468440" },
+      { name: "Dr. Kamrun Begum", specialty: "Chiropractor", phone: "+880 8929 163493" },
+      { name: "Dr. Javed Chowdhury", specialty: "General Surgeon", phone: "+880 1234 567800" },
+      { name: "Dr. Mahmudul Hasan", specialty: "Urologist", phone: "+880 2222 333444" },
+      { name: "Dr. Salma Siddique", specialty: "Pediatrician", phone: "+880 5555 666777" },
+      { name: "Dr. Fahim Mahmud", specialty: "Endocrinologist", phone: "+880 8888 999000" }
+    ];
+
+    const doctorsList = document.getElementById('doctorsList');
+    const searchInput = document.getElementById('searchInput');
+
+    function renderDoctors(list) {
+      doctorsList.innerHTML = '';
+      if (list.length === 0) {
+        doctorsList.innerHTML = '<li>No doctors found.</li>';
+        return;
+      }
+      list.forEach(doc => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="name">${doc.name}</span>
+          <span class="specialty">${doc.specialty}</span>
+          <span class="phone">${doc.phone}</span>
+        `;
+        doctorsList.appendChild(li);
+      });
+    }
+
+    searchInput.addEventListener('input', () => {
+      const term = searchInput.value.toLowerCase().trim();
+      const filtered = doctors.filter(doc =>
+        doc.name.toLowerCase().includes(term) ||
+        doc.specialty.toLowerCase().includes(term)
+      );
+      renderDoctors(filtered);
+    });
+
+    renderDoctors(doctors);
+  </script>
+</body>
+</html>

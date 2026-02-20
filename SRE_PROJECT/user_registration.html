@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      overflow: hidden;
+    }
+
+    /* 🎥 Background Video Styling */
+    .bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    /* 📦 Centering Container */
+    .wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      width: 850px;
+      max-width: 100%;
+      height: 500px;
+      background-color: rgba(30, 33, 46, 0.7);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar {
+      width: 230px;
+      background-color: rgba(40, 44, 52, 0.8);
+      color: #61dafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 10px #61dafb55;
+    }
+
+    .form-section {
+      flex: 1;
+      padding: 50px 40px;
+      background-color: rgba(30, 33, 46, 0.3);
+      color: #e1e1e6;
+    }
+
+    h1 {
+      color: #c678dd;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+      text-shadow: 0 0 4px #000;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #abb2bf;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background-color: rgba(43, 47, 64, 0.8);
+      color: #fff;
+      font-size: 1rem;
+      transition: 0.3s ease;
+    }
+
+    .input-field:focus {
+      border-color: #61dafb;
+      outline: none;
+      box-shadow: 0 0 8px #61dafb44;
+    }
+
+    .submit-button {
+      background-color: #61dafb;
+      color: #000;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .submit-button:hover {
+      background-color: #21a1f1;
+      transform: translateY(-2px);
+    }
+
+    .link {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #98c379;
+    }
+
+    .link a {
+      color: #98c379;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 20px 0;
+      }
+
+      .form-section {
+        padding: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔁 Background Video -->
+  <video class="bg-video" autoplay loop muted playsinline>
+    <source src="istockphoto-1422468597-640_adpp_is.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- 💠 Centered Wrapper -->
+  <div class="wrapper">
+    <div class="container">
+      <div class="sidebar">Register</div>
+      <div class="form-section">
+        <h1>Create Your Account</h1>
+        <form id="registerForm">
+          <label for="name">Full Name</label>
+          <input class="input-field" type="text" id="name" name="name" required />
+
+          <label for="email">Email</label>
+          <input class="input-field" type="email" id="email" name="email" required />
+
+          <label for="password">Password</label>
+          <input class="input-field" type="password" id="password" name="password" required />
+
+          <input class="submit-button" type="submit" value="Register" />
+        </form>
+        <div class="link">
+          Already have an account? <a href="user_login.html">Login here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      if (res.ok) window.location.href = 'user_login.html';
+    });
+  </script>
+</body>
+</html>

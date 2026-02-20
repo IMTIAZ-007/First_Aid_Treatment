@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Health Monitor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body.dark {
+      background-color: #1a202c;
+      color: white;
+    }
+    .dark input,
+    .dark button {
+      background-color: #2d3748;
+      color: white;
+      border-color: #4a5568;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white p-6 min-h-screen">
+  <div class="max-w-5xl mx-auto shadow-2xl bg-white dark:bg-gray-900 rounded-2xl p-8">
+    <h1 class="text-4xl font-bold mb-6 text-center text-teal-700 dark:text-teal-300">Smart Health Monitor</h1>
+
+    <div class="mb-6 flex justify-end">
+      <button onclick="toggleDarkMode()" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition">Toggle Dark Mode</button>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <input id="weight" type="number" placeholder="Weight (kg)" class="p-3 border rounded shadow">
+      <input id="height" type="number" placeholder="Height (cm)" class="p-3 border rounded shadow">
+      <input id="systolic" type="number" placeholder="Systolic BP" class="p-3 border rounded shadow">
+      <input id="diastolic" type="number" placeholder="Diastolic BP" class="p-3 border rounded shadow">
+      <input id="sugar" type="number" placeholder="Blood Sugar (mg/dL)" class="p-3 border rounded shadow">
+    </div>
+
+    <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <button onclick="generateCharts()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition">Generate Report</button>
+      <button onclick="downloadPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold transition">Download as PDF</button>
+    </div>
+
+    <div id="feedback" class="my-6 text-lg font-medium text-center"></div>
+
+    <div class="grid gap-6 mt-6">
+      <canvas id="bmiChart"></canvas>
+      <canvas id="bpChart"></canvas>
+      <canvas id="sugarChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+    }
+
+    function generateCharts() {
+      const weight = parseFloat(document.getElementById('weight').value);
+      const height = parseFloat(document.getElementById('height').value);
+      const systolic = parseFloat(document.getElementById('systolic').value);
+      const diastolic = parseFloat(document.getElementById('diastolic').value);
+      const sugar = parseFloat(document.getElementById('sugar').value);
+
+      if (!weight || !height || !systolic || !diastolic || !sugar) {
+        alert("Please fill all fields correctly.");
+        return;
+      }
+
+      const heightM = height / 100;
+      const bmi = weight / (heightM * heightM);
+
+      localStorage.setItem("healthData", JSON.stringify({ weight, height, systolic, diastolic, sugar, bmi }));
+
+      let bmiStatus = bmi < 18.5 ? 'Underweight' : bmi <= 24.9 ? 'Normal' : 'Overweight';
+      let sugarStatus = sugar <= 99 ? 'Normal' : 'High';
+      let bpStatus = systolic <= 120 && diastolic <= 80 ? 'Normal' : 'High';
+
+      document.getElementById("feedback").innerText = `Your BMI is ${bmi.toFixed(1)} (${bmiStatus}). BP: ${bpStatus}. Sugar: ${sugarStatus}.`;
+
+      new Chart(document.getElementById('bmiChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Your BMI', 'Min Ideal', 'Max Ideal'],
+          datasets: [{
+            label: 'BMI',
+            data: [bmi, 18.5, 24.9],
+            backgroundColor: ['orange', 'green', 'green']
+          }]
+        },
+        options: { responsive: true, plugins: { title: { display: true, text: 'BMI Chart' } } }
+      });
+
+      new Chart(document.getElementById('bpChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Systolic', 'Diastolic'],
+          datasets: [
+            { label: 'You', data: [systolic, diastolic], backgroundColor: 'red' },
+            { label: 'Ideal', data: [120, 80], backgroundColor: 'green' }
+          ]
+        },
+        options: { responsive: true, plugins: { title: { display: true, text: 'Blood Pressure' } } }
+      });
+
+      new Chart(document.getElementById('sugarChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Your Sugar', 'Ideal Max'],
+          datasets: [{
+            label: 'Sugar (mg/dL)',
+            data: [sugar, 99],
+            backgroundColor: ['purple', 'green']
+          }]
+        },
+        options: { responsive: true, plugins: { title: { display: true, text: 'Blood Sugar' } } }
+      });
+    }
+
+    function downloadPDF() {
+      import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js').then(() => {
+        html2canvas(document.body).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jspdf.jsPDF();
+          pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+          pdf.save("health_report.pdf");
+        });
+      });
+    }
+  </script>
+</body>
+</html>

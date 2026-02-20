@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Treatment Reviews</title>
+  <style>
+    body {
+      font-family: monospace, sans-serif;
+      background: #282c34;
+      color: #abb2bf;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #61dafb;
+    }
+    #cardsContainer {
+      width: 90%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: #21252b;
+      border-radius: 8px;
+      padding: 15px 20px;
+      box-shadow: 0 4px 10px #000000aa;
+    }
+    .card h3 {
+      color: #61dafb;
+      margin-bottom: 8px;
+    }
+    .rating {
+      color: #e5c07b;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .reviews {
+      max-height: 120px;
+      overflow-y: auto;
+      border-top: 1px solid #3e4451;
+      padding-top: 8px;
+      color: #abb2bfaa;
+    }
+    .reviews div {
+      margin-bottom: 6px;
+    }
+    .no-reviews {
+      font-style: italic;
+      color: #5c6370;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Treatment Reviews & Ratings</h1>
+
+  <div id="cardsContainer" role="list" aria-live="polite">
+    Loading treatments...
+  </div>
+
+  <script>
+    const apiBase = 'http://localhost:3000';
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+    }
+
+    async function loadTreatments() {
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = 'Loading treatments...';
+
+      try {
+        const res = await fetch(`${apiBase}/get-treatments`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const treatments = await res.json();
+        if (!Array.isArray(treatments) || treatments.length === 0) {
+          container.innerHTML = '<p>No treatments found.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+
+        for (const treatment of treatments) {
+          // Create card element
+          const card = document.createElement('article');
+          card.className = 'card';
+          card.setAttribute('role', 'listitem');
+          card.tabIndex = 0;
+          card.innerHTML = `<h3>${escapeHTML(treatment.name)}</h3><div class="rating">Loading rating...</div><div class="reviews">Loading reviews...</div>`;
+          container.appendChild(card);
+
+          // Fetch rating & reviews
+          try {
+            const ratingRes = await fetch(`${apiBase}/get-treatment-rating/${treatment.id}`);
+            if (!ratingRes.ok) throw new Error(`HTTP ${ratingRes.status}`);
+
+            const data = await ratingRes.json();
+            const avgRating = data.average_rating ?? 'N/A';
+            const reviewsArr = Array.isArray(data.reviews) ? data.reviews : [];
+
+            // Update card rating
+            card.querySelector('.rating').textContent = `Average Rating: ${avgRating}`;
+
+            // Update reviews
+            if (reviewsArr.length === 0) {
+              card.querySelector('.reviews').innerHTML = `<div class="no-reviews">No reviews yet.</div>`;
+            } else {
+              card.querySelector('.reviews').innerHTML =
+                reviewsArr.map(r => `<div>• ${escapeHTML(r)}</div>`).join('');
+            }
+
+          } catch (err) {
+            console.error(`Failed to load rating for treatment ${treatment.id}`, err);
+            card.querySelector('.rating').textContent = 'Average Rating: N/A';
+            card.querySelector('.reviews').innerHTML = '<div class="no-reviews">Could not load reviews.</div>';
+          }
+        }
+      } catch (err) {
+        container.innerHTML = `<p style="color:#e06c75;">Failed to load treatments. ${err.message}</p>`;
+        console.error('Error loading treatments:', err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadTreatments);
+  </script>
+
+</body>
+</html>

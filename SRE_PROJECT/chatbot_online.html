@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online First Aid Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 400px;
+      background-color: #2a2a2a;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+    }
+
+    .chat-header {
+      background-color: #3a3a3a;
+      color: #fff;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-header h1 {
+      font-size: 1rem;
+      flex-grow: 1;
+      text-align: center;
+      margin: 0;
+    }
+
+    .chat-header button {
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0 5px;
+    }
+
+    .chat-messages {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .message-content {
+      padding: 10px;
+      border-radius: 5px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      flex-direction: row-reverse;
+    }
+
+    .user-message .message-content {
+      background-color: #4a90e2;
+      margin-right: 10px;
+    }
+
+    .bot-message .message-content {
+      background-color: #3a3a3a;
+      margin-left: 10px;
+    }
+
+    .profile-image {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .chat-input-container {
+      display: flex;
+      padding: 10px;
+      background-color: #2a2a2a;
+    }
+
+    #user-input {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #4a4a4a;
+      border-radius: 5px;
+      font-size: 1rem;
+      background-color: #3a3a3a;
+      color: #e0e0e0;
+    }
+
+    #send-button {
+      padding: 10px;
+      background-color: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    #media-input {
+      display: none;
+    }
+
+    #media-label {
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    body.light {
+      background-color: #f4f4f4;
+      color: #000;
+    }
+
+    body.light .chat-container {
+      background-color: #fff;
+    }
+
+    body.light .chat-header {
+      background-color: #e0e0e0;
+      color: #000;
+    }
+
+    body.light .user-message .message-content {
+      background-color: #007bff;
+      color: white;
+    }
+
+    body.light .bot-message .message-content {
+      background-color: #eee;
+      color: black;
+    }
+
+    body.light #user-input {
+      background-color: #fff;
+      color: #000;
+      border-color: #ccc;
+    }
+
+    body.light #send-button {
+      background-color: #007bff;
+    }
+
+    body.light #send-button:hover {
+      background-color: #0056b3;
+    }
+
+    video, img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <button id="dark-mode-toggle">🌙</button>
+      <h1 id="chat-title">Online First Aid Chatbot</h1>
+      <button id="translate-toggle" data-lang="en">🌐 বাংলা</button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-container">
+      <input type="text" id="user-input" placeholder="Type your message..." />
+      <label for="media-input" id="media-label">📎</label>
+      <input type="file" id="media-input" accept="image/*,video/*" />
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = 'AIzaSyAbmDQHNM_PRyZMdju71yTwDQ0b90kev70'; // Replace this
+    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+
+    async function generateResponse(prompt) {
+      const res = await fetch(`${API_URL}?key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+      if (!res.ok) throw new Error('Gemini API Error');
+      const data = await res.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    function addMessage(message, isUser) {
+      const div = document.createElement('div');
+      div.classList.add('message', isUser ? 'user-message' : 'bot-message');
+
+      const img = document.createElement('img');
+      img.src = isUser ? 'user.jpg' : 'bot.jpg';
+      img.alt = isUser ? 'User' : 'Bot';
+      img.className = 'profile-image';
+
+      const content = document.createElement('div');
+      content.className = 'message-content';
+      content.textContent = message;
+
+      div.appendChild(img);
+      div.appendChild(content);
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addMedia(src, type, isUser) {
+      const div = document.createElement('div');
+      div.classList.add('message', isUser ? 'user-message' : 'bot-message');
+
+      const img = document.createElement('img');
+      img.src = isUser ? 'user.jpg' : 'bot.jpg';
+      img.className = 'profile-image';
+
+      const media = document.createElement('div');
+      media.className = 'message-content';
+
+      const tag = document.createElement(type);
+      tag.src = src;
+      if (type === 'video') tag.controls = true;
+
+      media.appendChild(tag);
+      div.appendChild(img);
+      div.appendChild(media);
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function handleUserInput() {
+      const text = userInput.value.trim();
+      if (text === '') return;
+      addMessage(text, true);
+      userInput.value = '';
+      sendButton.disabled = true;
+
+      try {
+        const reply = await generateResponse(text);
+        addMessage(reply, false);
+      } catch (err) {
+        addMessage("Sorry, I encountered an error. Please try again.", false);
+      } finally {
+        sendButton.disabled = false;
+      }
+    }
+
+    sendButton.addEventListener('click', handleUserInput);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleUserInput();
+      }
+    });
+
+    document.getElementById('media-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const type = file.type.startsWith('video') ? 'video' : 'img';
+        addMedia(reader.result, type, true);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('light');
+    });
+
+    async function translateMessage(text, lang) {
+      const translated = await generateResponse(`Translate this to ${lang}: ${text}`);
+      return translated;
+    }
+
+    document.getElementById('translate-toggle').addEventListener('click', async () => {
+      const langBtn = document.getElementById('translate-toggle');
+      const heading = document.getElementById('chat-title');
+      const input = document.getElementById('user-input');
+      const currentLang = langBtn.dataset.lang;
+
+      if (currentLang === 'en') {
+        langBtn.textContent = '🌐 English';
+        langBtn.dataset.lang = 'bn';
+        heading.textContent = 'অনলাইন ফার্স্ট এইড চ্যাটবট';
+        input.placeholder = 'আপনার বার্তা লিখুন...';
+
+        const messages = document.querySelectorAll('.message-content');
+        for (const el of messages) {
+          el.textContent = await translateMessage(el.textContent, 'Bengali');
+        }
+      } else {
+        window.location.reload(); // simplest way to revert
+      }
+    });
+  </script>
+</body>
+</html>

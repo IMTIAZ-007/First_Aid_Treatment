@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Login</title>
+  <style>
+    /* Basic reset and font */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+
+      background-size: cover;
+      color: #2c2c54;
+      position: relative;
+      overflow-x: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    /* Watermark behind content */
+    body::before {
+      content: "✚";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 40vw;
+      color: rgba(255, 255, 255, 0.07);
+      user-select: none;
+      pointer-events: none;
+      font-weight: 900;
+      font-family: Arial, sans-serif;
+      z-index: 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+      display: flex;
+      width: 850px;
+      max-width: 100%;
+      min-height: 450px;
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(135deg, #6a5acd, #483d8b);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.3);
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .form-section {
+      flex: 1;
+      padding: 60px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h1 {
+      color: #483d8b;
+      margin-bottom: 40px;
+      font-weight: 700;
+      font-size: 2.75rem;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 0 0 5px rgba(72, 61, 139, 0.3);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #4b4b7a;
+      transition: color 0.3s ease;
+    }
+
+    input.input-field {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      border: 1.5px solid #6a5acd;
+      font-size: 1rem;
+      outline-offset: 2px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input.input-field:focus {
+      border-color: #483d8b;
+      box-shadow: 0 0 8px rgba(72, 61, 139, 0.5);
+      color: #2c2c54;
+    }
+
+    .submit-button {
+      background-color: #6a5acd;
+      color: white;
+      padding: 14px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(106, 90, 205, 0.5);
+      transition: background-color 0.4s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+
+    .submit-button:hover {
+      background-color: #483d8b;
+      box-shadow: 0 12px 25px rgba(72, 61, 139, 0.7);
+      transform: translateY(-2px);
+    }
+
+    .submit-button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 10px rgba(72, 61, 139, 0.4);
+    }
+
+    .link {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #483d8b;
+      user-select: none;
+    }
+
+    .link a {
+      color: #6a5acd;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s ease, text-decoration 0.3s ease;
+    }
+
+    .link a:hover {
+      color: #483d8b;
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+        min-height: auto;
+      }
+      .sidebar {
+        width: 100%;
+        padding: 20px 0;
+        font-size: 24px;
+      }
+      .form-section {
+        padding: 40px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Student Login Form">
+    <div class="sidebar" aria-hidden="true">User Login</div>
+    <div class="form-section">
+      <h1>Login to Your Account</h1>
+      <form id="loginForm" novalidate>
+        <label for="email">Email</label>
+        <input
+          class="input-field"
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          required
+          autocomplete="username"
+          aria-required="true"
+        />
+
+        <label for="password">Password</label>
+        <input
+          class="input-field"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+          aria-required="true"
+          minlength="6"
+        />
+
+        <input class="submit-button" type="submit" value="Login" />
+      </form>
+      <div class="link">
+        Don't have an account? <a href="user_registration.html">Register here</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      try {
+        const res = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('student', JSON.stringify(data.student));
+          window.location.href = 'user_dashboard.html';
+        } else {
+          alert(data.message || 'Invalid credentials');
+        }
+      } catch (err) {
+        alert('Login failed. Please try again later.');
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

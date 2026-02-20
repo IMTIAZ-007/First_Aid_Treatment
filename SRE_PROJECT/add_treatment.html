@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Treatments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff00a0, #9b4dff, #0076ff);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .content {
+      max-width: 1000px;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Add Treatment section styled as card */
+    #addTreatmentSection {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      padding: 30px 40px 40px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+      transition: box-shadow 0.3s ease;
+    }
+    #addTreatmentSection:hover {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+    }
+
+    #addTreatmentSection h2 {
+      font-size: 2rem;
+      margin-bottom: 25px;
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+      font-weight: 700;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #addTreatmentForm {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    #addTreatmentForm input[type="text"],
+    #addTreatmentForm textarea {
+      padding: 12px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #222;
+      color: #fff;
+      transition: background 0.3s ease, border-color 0.3s ease;
+      resize: vertical;
+      outline-offset: 2px;
+    }
+    #addTreatmentForm input[type="text"]:focus,
+    #addTreatmentForm textarea:focus {
+      background: #333;
+      border-color: #ff00a0;
+      outline: none;
+    }
+
+    #addTreatmentForm input[type="file"] {
+      padding: 8px;
+      background-color: #444;
+      border-radius: 6px;
+      border: none;
+      color: #eee;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #addTreatmentForm input[type="file"]:hover {
+      background-color: #555;
+    }
+
+    #addTreatmentForm label {
+      font-size: 14px;
+      color: #aaa;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    #addTreatmentForm button {
+      padding: 14px 0;
+      background: linear-gradient(135deg, #ff00a0, #9b4dff);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    #addTreatmentForm button:hover {
+      background: #0076ff;
+      transform: translateY(-4px);
+    }
+
+    /* Search bar */
+    .search-bar {
+      max-width: 600px;
+      margin: 0 auto 10px auto;
+      display: flex;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px 0 0 8px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+      background-color: #222;
+      color: #fff;
+      transition: background-color 0.3s ease;
+    }
+    .search-bar input::placeholder {
+      color: #888;
+    }
+    .search-bar input:focus {
+      background-color: #444;
+    }
+    .search-bar button {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #ff00a0, #9b4dff);
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      color: white;
+      font-size: 18px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-bar button:hover {
+      background: #0076ff;
+      transform: scale(1.05);
+    }
+
+    /* Cards container */
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    /* Treatment card */
+    .card {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 420px;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85);
+      background: linear-gradient(135deg, #ff00a0, #9b4dff);
+    }
+
+    .card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .card .details {
+      font-size: 1rem;
+      color: #ddd;
+      flex-grow: 1;
+      margin-bottom: 15px;
+      overflow: auto;
+      max-height: 100px;
+    }
+
+    .media-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+
+    /* Thumbnail image inside card */
+    .media-links img {
+      max-height: 130px;
+      border-radius: 10px;
+      object-fit: cover;
+      width: 100%;
+      background: #000;
+      transition: transform 0.3s ease;
+    }
+    .media-links img:hover {
+      transform: scale(1.05);
+    }
+
+    video {
+      border-radius: 10px;
+      max-height: 180px;
+      width: 100%;
+      background: #000;
+    }
+
+    .related-meds {
+      font-size: 0.95rem;
+      color: #a7d8aa;
+      margin-bottom: 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #ff00a0, #9b4dff);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #0076ff;
+      transform: translateY(-3px);
+    }
+
+    .update-btn {
+      background: linear-gradient(135deg, #ffa500, #ffae42);
+    }
+    .update-btn:hover {
+      background: #ffb84d;
+    }
+
+    .delete-btn {
+      background: linear-gradient(135deg, #dc143c, #ff4c61);
+    }
+    .delete-btn:hover {
+      background: #ff5c74;
+    }
+
+    /* Modal for enlarged image */
+    #imgModal {
+      position: fixed;
+      display: none;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      cursor: zoom-out;
+    }
+
+    #imgModal img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(255,255,255,0.3);
+    }
+
+    #imgModal:focus {
+      outline: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .content {
+        padding: 15px;
+      }
+      .card {
+        min-height: auto;
+      }
+      #addTreatmentSection {
+        padding: 25px 20px 30px;
+      }
+      #addTreatmentForm {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="content" role="main">
+    <h1>Manage Treatments</h1>
+
+    <section id="addTreatmentSection" aria-label="Add new treatment section">
+      <h2><i class="fas fa-plus-circle"></i> Add Treatment</h2>
+      <form id="addTreatmentForm" enctype="multipart/form-data" aria-label="Add treatment form">
+        <input
+          type="text"
+          name="name"
+          placeholder="Treatment Name"
+          required
+          aria-required="true"
+          autocomplete="off"
+        />
+        <textarea
+          name="details"
+          placeholder="Treatment Details"
+          rows="4"
+          required
+          aria-required="true"
+        ></textarea>
+        <label for="imageUpload">Upload Image:
+          <input type="file" id="imageUpload" name="image" accept="image/*" aria-label="Upload image" />
+        </label>
+        <label for="videoUpload">Upload Video:
+          <input type="file" id="videoUpload" name="video" accept="video/*" aria-label="Upload video" />
+        </label>
+        <input
+          type="text"
+          name="related_medicine"
+          placeholder="Related Medicines"
+          aria-label="Related medicines"
+          autocomplete="off"
+        />
+        <button type="submit" class="jellyfish-btn" style="margin-top: 10px;">
+          <i class="fas fa-plus"></i> Add Treatment
+        </button>
+      </form>
+    </section>
+
+    <form id="searchForm" class="search-bar" role="search" aria-label="Search treatments">
+      <input
+        type="search"
+        id="searchInput"
+        name="searchInput"
+        placeholder="Search treatments..."
+        aria-label="Search treatments"
+        autocomplete="off"
+      />
+      <button type="submit" aria-label="Search">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+
+    <section class="cards-container" id="cardsContainer" aria-live="polite" aria-relevant="additions"></section>
+  </main>
+
+  <!-- Image Modal -->
+  <div id="imgModal" tabindex="-1" role="dialog" aria-modal="true" aria-label="Enlarged treatment image">
+    <img src="" alt="Enlarged treatment image" />
+  </div>
+
+  <script>
+    const apiBase = 'http://localhost:3000'; // Adjust to your API base
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+    }
+
+    // Create card for each treatment
+    function createCard({ id, name, details, image, video, related_medicine }) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.setAttribute("role", "listitem");
+      card.tabIndex = 0;
+
+      const imgHTML = image
+        ? `<img src="${escapeHTML(image)}" alt="Image for ${escapeHTML(name)}" loading="lazy" class="treatment-img" />`
+        : `<div style="color:#888; font-size:0.9rem; text-align:center;">No Image</div>`;
+
+      const videoHTML = video
+        ? `<video controls preload="metadata" aria-label="Video for ${escapeHTML(name)}" muted>
+             <source src="${escapeHTML(video)}" type="video/mp4">
+             Your browser does not support the video tag.
+           </video>`
+        : `<div style="color:#888; font-size:0.9rem; text-align:center;">No Video</div>`;
+
+      card.innerHTML = `
+        <h3><i class="fas fa-notes-medical"></i> ${escapeHTML(name)}</h3>
+        <p class="details">${escapeHTML(details)}</p>
+        <div class="media-links" aria-label="Media for ${escapeHTML(name)}" style="margin-bottom: 15px;">
+          ${imgHTML}
+          <div style="margin-top:12px;">${videoHTML}</div>
+        </div>
+        <div class="related-meds" aria-label="Related medicines">
+          <strong>Related Medicines:</strong> ${escapeHTML(related_medicine || 'None')}
+        </div>
+        <div class="actions">
+          <button class="action-btn update-btn" aria-label="Update treatment ${escapeHTML(name)}" onclick="updateTreatment(${id})">
+            <i class="fas fa-pen"></i> Update
+          </button>
+          <button class="action-btn delete-btn" aria-label="Delete treatment ${escapeHTML(name)}" onclick="deleteTreatment(${id})">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
+      `;
+      return card;
+    }
+
+    function loadTreatments() {
+      fetch(`${apiBase}/get-treatments`)
+        .then(res => res.json())
+        .then(data => {
+          window.allTreatments = data; // cache all for search
+          displayTreatments(data);
+          attachImageModalHandlers();
+        })
+        .catch(err => {
+          console.error("Load error:", err);
+          document.getElementById("cardsContainer").innerHTML = `<p style="color:#fbb;">Failed to load treatments.</p>`;
+        });
+    }
+
+    function displayTreatments(treatments) {
+      const container = document.getElementById("cardsContainer");
+      container.innerHTML = "";
+      if (treatments.length === 0) {
+        container.innerHTML = `<p style="color:#aaa; text-align:center;">No treatments found.</p>`;
+        return;
+      }
+      treatments.forEach(t => container.appendChild(createCard(t)));
+      attachImageModalHandlers();
+    }
+
+    document.getElementById("addTreatmentForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch(`${apiBase}/add-treatment`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.ok ? res.text() : Promise.reject("Server Error"))
+      .then(msg => {
+        alert(msg);
+        form.reset();
+        loadTreatments();
+      })
+      .catch(err => alert("Add failed: " + err));
+    });
+
+    function updateTreatment(id) {
+      const treatment = window.allTreatments.find(t => t.id === id);
+      if (!treatment) return alert("Treatment not found");
+
+      const newName = prompt("New treatment name:", treatment.name);
+      if (!newName) return;
+      const newDetails = prompt("New treatment details:", treatment.details);
+      if (!newDetails) return;
+      const newRelated = prompt("New related medicines (comma separated):", treatment.related_medicine || "");
+
+      fetch(`${apiBase}/update-treatment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name: newName, details: newDetails, related_medicine: newRelated })
+      })
+      .then(res => res.ok ? res.text() : Promise.reject("Server Error"))
+      .then(alert)
+      .then(loadTreatments)
+      .catch(err => alert("Update failed: " + err));
+    }
+
+    function deleteTreatment(id) {
+      console.log("Deleting treatment with id:", id);
+      if (!confirm("Delete this treatment?")) return;
+      fetch(`${apiBase}/delete-treatment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      })
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Server error: ${res.status} - ${text}`);
+        }
+        return res.text();
+      })
+      .then(msg => {
+        alert(msg);
+        loadTreatments();
+      })
+      .catch(err => {
+        alert("Delete failed: " + err.message);
+        console.error("Delete error:", err);
+      });
+    }
+
+    // Search functionality
+    document.getElementById("searchForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const query = e.target.searchInput.value.trim().toLowerCase();
+      if (!window.allTreatments) return;
+
+      const filtered = window.allTreatments.filter(t => {
+        return t.name.toLowerCase().includes(query)
+          || (t.details && t.details.toLowerCase().includes(query))
+          || (t.related_medicine && t.related_medicine.toLowerCase().includes(query));
+      });
+
+      displayTreatments(filtered);
+    });
+
+    // Image modal handlers
+    function attachImageModalHandlers() {
+      const modal = document.getElementById("imgModal");
+      const modalImg = modal.querySelector("img");
+      const images = document.querySelectorAll(".treatment-img");
+
+      images.forEach(img => {
+        img.style.cursor = "zoom-in";
+        img.onclick = () => {
+          modalImg.src = img.src;
+          modal.style.display = "flex";
+          modal.focus();
+        };
+      });
+
+      modal.onclick = () => {
+        modal.style.display = "none";
+        modalImg.src = "";
+      };
+
+      modal.onkeydown = e => {
+        if (e.key === "Escape") {
+          modal.style.display = "none";
+          modalImg.src = "";
+        }
+      };
+    }
+
+    loadTreatments();
+  </script>
+</body>
+</html>

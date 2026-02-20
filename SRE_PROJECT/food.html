@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>খাদ্য ও পুষ্টি পরামর্শ | Food and Nutrition Tips</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+    body {
+      font-family: 'Fira Code', monospace, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #c0c9d9;
+      min-height: 100vh;
+      padding: 3rem 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      user-select: none;
+    }
+
+    .container {
+      background: rgba(20, 29, 42, 0.9);
+      padding: 2.5rem 3rem;
+      border-radius: 16px;
+      box-shadow:
+        0 4px 20px rgba(46, 226, 247, 0.3),
+        0 0 30px rgba(46, 226, 247, 0.15) inset;
+      max-width: 720px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: #a3b8cc;
+    }
+
+    h1 {
+      color: #2ee2f7;
+      font-weight: 900;
+      font-size: 2.8rem;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 12px #2ee2f7aa;
+    }
+
+    .topic-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2.2rem;
+      flex-wrap: wrap;
+    }
+
+    .topic-btn {
+      background: #18455f;
+      border: none;
+      border-radius: 12px;
+      padding: 0.85rem 1.8rem;
+      color: #a3b8cc;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Fira Code', monospace;
+      box-shadow: 0 0 15px #2ee2f7aa;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      user-select: none;
+      font-size: 1rem;
+      outline-offset: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .topic-btn::before {
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #2ee2f7;
+      opacity: 0.15;
+      transform: skewY(-20deg);
+      transition: top 0.3s ease;
+      z-index: 0;
+    }
+    .topic-btn:hover::before,
+    .topic-btn.active::before {
+      top: 0;
+    }
+
+    .topic-btn:hover,
+    .topic-btn.active {
+      background: #2ee2f7;
+      color: #062837;
+      box-shadow:
+        0 0 20px #2ee2f7,
+        0 0 35px #2ee2f7cc;
+      outline: none;
+      z-index: 1;
+    }
+
+    #nutritionContent {
+      background: #133047;
+      border-radius: 16px;
+      padding: 1.8rem 2.2rem;
+      box-shadow: inset 0 0 30px #2ee2f7cc;
+      color: #72e0ff;
+      max-width: 600px;
+      margin: 0 auto;
+      user-select: text;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      font-weight: 600;
+      font-family: 'Noto Sans Bengali', 'SolaimanLipi', 'Siyam Rupali', 'Arial', sans-serif;
+      font-size: 1.2rem;
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 0.6s forwards;
+      position: relative;
+    }
+
+    #nutritionContent img {
+      max-width: 140px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #2ee2f7aa;
+      user-select: none;
+      filter: drop-shadow(0 0 10px #2ee2f7aa);
+      object-fit: contain;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    #nutritionContent img:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    a.pdf-link {
+      color: #72e0ff;
+      font-weight: 700;
+      margin-top: -0.2rem;
+      font-size: 0.95rem;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    a.pdf-link:hover {
+      color: #a1dfff;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="container" role="main">
+    <h1>খাদ্য ও পুষ্টি পরামর্শ<br /><span style="font-size:1.2rem; color:#72e0ff; font-weight: 700;">Food and Nutrition Tips</span></h1>
+
+    <nav class="topic-buttons" role="tablist" aria-label="Food and Nutrition Topics">
+      <button class="topic-btn active" role="tab" aria-selected="true" aria-controls="nutritionContent" id="topic-balanced" tabindex="0" onclick="showNutrition('balanced')">সুষম আহার</button>
+      <button class="topic-btn" role="tab" aria-selected="false" aria-controls="nutritionContent" id="topic-vitamins" tabindex="-1" onclick="showNutrition('vitamins')">ভিটামিন</button>
+      <button class="topic-btn" role="tab" aria-selected="false" aria-controls="nutritionContent" id="topic-hydration" tabindex="-1" onclick="showNutrition('hydration')">জল পান</button>
+      <button class="topic-btn" role="tab" aria-selected="false" aria-controls="nutritionContent" id="topic-proteins" tabindex="-1" onclick="showNutrition('proteins')">প্রোটিন</button>
+      <button class="topic-btn" role="tab" aria-selected="false" aria-controls="nutritionContent" id="topic-fiber" tabindex="-1" onclick="showNutrition('fiber')">ফাইবার</button>
+      <button class="topic-btn" role="tab" aria-selected="false" aria-controls="nutritionContent" id="topic-minerals" tabindex="-1" onclick="showNutrition('minerals')">মিনারেলস</button>
+    </nav>
+
+    <section id="nutritionContent" role="tabpanel" tabindex="0" aria-labelledby="topic-balanced">
+      <a href="https://www.who.int/nutrition/publications/guidelines/balanced_diet_en.pdf" target="_blank" rel="noopener" title="Open Balanced Diet PDF in new tab">
+        <img src="https://cdn-icons-png.flaticon.com/512/3441/3441431.png" alt="Balanced Diet PDF" />
+      </a>
+      <p>সুষম আহার আপনার শরীরের জন্য অত্যন্ত গুরুত্বপূর্ণ। বিভিন্ন ধরনের খাদ্য গ্রহণ করলে শরীর ভালো থাকে এবং রোগ প্রতিরোধ ক্ষমতা বৃদ্ধি পায়।</p>
+      <a href="https://www.who.int/nutrition/publications/guidelines/balanced_diet_en.pdf" class="pdf-link" target="_blank" rel="noopener" aria-label="Balanced Diet PDF link">বিস্তারিত পিডিএফ পড়ুন</a>
+    </section>
+  </main>
+
+  <script>
+    const nutritionData = {
+      balanced: {
+        img: 'https://cdn-icons-png.flaticon.com/512/3441/3441431.png',
+        alt: 'Balanced Diet PDF',
+        tip: 'সুষম আহার আপনার শরীরের জন্য অত্যন্ত গুরুত্বপূর্ণ। বিভিন্ন ধরনের খাদ্য গ্রহণ করলে শরীর ভালো থাকে এবং রোগ প্রতিরোধ ক্ষমতা বৃদ্ধি পায়।',
+        pdf: 'https://www.who.int/nutrition/publications/guidelines/balanced_diet_en.pdf'
+      },
+      vitamins: {
+        img: 'https://cdn-icons-png.flaticon.com/512/833/833472.png',
+        alt: 'Vitamins PDF',
+        tip: 'ভিটামিন শরীরের রোগ প্রতিরোধ ক্ষমতা বাড়ায় এবং শক্তি প্রদান করে। নিয়মিত ফলমূল ও সবজি গ্রহণ করুন।',
+        pdf: 'https://www.who.int/nutrition/publications/vitamins_minerals/en/' // Example placeholder
+      },
+      hydration: {
+        img: 'https://cdn-icons-png.flaticon.com/512/3050/3050301.png',
+        alt: 'Hydration PDF',
+        tip: 'প্রতিদিন পর্যাপ্ত পরিমাণে পানি পান করুন। পানি শরীরের তাপমাত্রা নিয়ন্ত্রণ এবং বিষাক্ত পদার্থ নির্গত করতে সাহায্য করে।',
+        pdf: 'https://www.cdc.gov/nutrition/data-statistics/plain-water-the-healthier-choice.html' // Example placeholder
+      },
+      proteins: {
+        img: 'https://cdn-icons-png.flaticon.com/512/2314/2314623.png',
+        alt: 'Proteins PDF',
+        tip: 'প্রোটিন পেশী গঠন এবং শরীরের নানা কাজের জন্য অপরিহার্য। ডাল, মাংস, ডিম, ও বাদাম থেকে প্রোটিন গ্রহণ করুন।',
+        pdf: 'https://www.healthline.com/nutrition/how-much-protein-per-day' // Example placeholder
+      },
+      fiber: {
+        img: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png',
+        alt: 'Fiber PDF',
+        tip: 'ফাইবার হজমে সাহায্য করে এবং কোষ্ঠকাঠিন্যের সমস্যা কমায়। শাকসবজি, ফল, এবং বাদাম থেকে ফাইবার নিন।',
+        pdf: 'https://www.healthline.com/nutrition/benefits-of-fiber' // Example placeholder
+      },
+      minerals: {
+        img: 'https://cdn-icons-png.flaticon.com/512/833/833314.png',
+        alt: 'Minerals PDF',
+        tip: 'মিনারেলস শরীরের অনেক গুরুত্বপূর্ণ কাজের জন্য প্রয়োজন। লৌহ, ক্যালসিয়াম, এবং ম্যাগনেসিয়াম সমৃদ্ধ খাবার খান।',
+        pdf: 'https://www.who.int/news-room/fact-sheets/detail/micronutrients' // Example placeholder
+      }
+    };
+
+    function showNutrition(topic) {
+      const content = nutritionData[topic];
+      const nutritionContent = document.getElementById('nutritionContent');
+
+      nutritionContent.style.opacity = 0;
+      setTimeout(() => {
+        nutritionContent.innerHTML = `
+          <a href="${content.pdf}" target="_blank" rel="noopener" title="Open ${content.alt} PDF in new tab">
+            <img src="${content.img}" alt="${content.alt}" />
+          </a>
+          <p>${content.tip}</p>
+          <a href="${content.pdf}" class="pdf-link" target="_blank" rel="noopener" aria-label="${content.alt} PDF link">বিস্তারিত পিডিএফ পড়ুন</a>
+        `;
+        nutritionContent.style.opacity = 1;
+      }, 300);
+
+      // Update active button styles and ARIA
+      const buttons = document.querySelectorAll('.topic-btn');
+      buttons.forEach(btn => {
+        if (btn.id === 'topic-' + topic) {
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+          btn.setAttribute('tabindex', '0');
+          nutritionContent.setAttribute('aria-labelledby', btn.id);
+          nutritionContent.focus();
+        } else {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+          btn.setAttribute('tabindex', '-1');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

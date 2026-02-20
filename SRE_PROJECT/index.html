@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>First Aid Treatment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @layer base {
+      html, body {
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        font-family: 'Fira Code', monospace, Consolas, 'Courier New', monospace;
+        background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+        background-size: cover;
+        color: #A9B7C6;
+        position: relative;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Watermark: faint first aid cross centered behind content */
+      body::before {
+        content: "✚";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40vw;
+        color: rgba(255, 255, 255, 0.05);
+        pointer-events: none;
+        user-select: none;
+        font-weight: 900;
+        z-index: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      a {
+        color: #287BDE;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #6897BB;
+        text-decoration: underline;
+      }
+
+      header#header {
+        background-color: rgba(49, 51, 53, 0.85);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(6px);
+        position: fixed;
+        width: 100%;
+        z-index: 100;
+      }
+
+      header#header h1 {
+        color: #A9B7C6;
+      }
+
+      /* New styles for navigation list */
+      header#header ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      header#header ul li a {
+        color: #A9B7C6;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      header#header ul li a:hover {
+        color: #22d3ee; /* Tailwind cyan-400 */
+        text-decoration: underline;
+      }
+
+      header#header ul li span {
+        background-color: #287BDE;
+      }
+
+      /* Content wrapper */
+      main.content-wrapper {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 6rem 1rem 4rem;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        background-color: rgba(43, 43, 43, 0.85);
+        width: 100%;
+        max-width: 960px;
+        padding: 2rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+      }
+
+      .hero-content {
+        text-align: center;
+      }
+
+      .hero-content h2 {
+        color: #A9B7C6;
+        font-weight: 700;
+        font-size: 3.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .hero-content p {
+        color: #6A7B8C;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .jellyfish-btn {
+        background-color: #6897BB;
+        color: #2B2B2B;
+        padding: 0.85rem 3rem;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px #1C1C1C;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .jellyfish-btn:hover {
+        background-color: #287BDE;
+        color: #FFFFFF;
+        box-shadow: 0 6px 15px #2A5CB0;
+      }
+
+      /* Section Titles */
+      h3 {
+        color: #A9B7C6;
+        font-weight: 700;
+        font-size: 2.25rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        text-shadow: 0 0 3px rgba(0,0,0,0.7);
+      }
+
+      /* Cards Container */
+      .cards-container {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+        gap: 1.75rem;
+      }
+
+      /* Individual Cards */
+      .card {
+        background-color: rgba(60, 63, 65, 0.75);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.85);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        backdrop-filter: blur(8px);
+        color: #A9B7C6;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(40, 123, 222, 0.7);
+      }
+
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+      }
+
+      .card h4 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: #A9B7C6;
+      }
+
+      .card p {
+        font-size: 1rem;
+        color: #8A96A8;
+      }
+
+      /* Video Section */
+      .video-section {
+        width: 100%;
+        max-width: 960px;
+        backdrop-filter: blur(6px);
+        background-color: rgba(43, 43, 43, 0.85);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.85);
+        padding: 1rem;
+        position: relative;
+      }
+
+      .video-section video {
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        width: 100%;
+        max-height: 480px;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* Overlay image on video */
+      .video-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        max-width: 300px;
+        opacity: 0.2;
+        user-select: none;
+        z-index: 20;
+      }
+      
+      /* Footer */
+      footer {
+        background-color: rgba(49, 51, 53, 0.85);
+        color: #6A7B8C;
+        font-size: 0.9rem;
+        box-shadow: inset 0 1px 0 #404040;
+        text-align: center;
+        padding: 1rem 0;
+        position: relative;
+        z-index: 10;
+        backdrop-filter: blur(6px);
+      }
+
+      /* Scroll header shadow */
+      header.scrolled {
+        box-shadow: 0 4px 15px rgba(40, 123, 222, 0.7);
+        background-color: rgba(40, 123, 222, 0.2);
+        backdrop-filter: blur(8px);
+        transition: background-color 0.3s ease;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header id="header" class="transition-colors duration-300 z-50">
+    <div class="container mx-auto px-6">
+      <nav class="flex justify-between items-center py-4">
+        <h1 class="text-2xl font-bold hover:scale-105 transform transition">First Aid Treatment</h1>
+        
+        <ul class="flex space-x-6">
+          <li class="relative group">
+            <a href="user_login.html" class="font-medium">User Login</a>
+            <span class="absolute left-0 bottom-0 h-0.5 w-0 group-hover:w-full transition-all duration-300"></span>
+          </li>
+          <li class="relative group">
+            <a href="admin_login.html" class="font-medium">Admin</a>
+            <span class="absolute left-0 bottom-0 h-0.5 w-0 group-hover:w-full transition-all duration-300"></span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="content-wrapper">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h2 class="animate-fadeInDown">Immediate First Aid, Anytime</h2>
+        <p class="mt-4 animate-fadeInUp">Navigate treatments, medicines, and diagnostics—all in one place.</p>
+        <a href="quickcheck.html" class="mt-8 jellyfish-btn hover:bg-cyan-600 font-semibold rounded-lg transform hover:-translate-y-1 transition">
+          Start Quick Checkup
+        </a>
+      </div>
+    </section>
+
+    <!-- Video Section with running video and overlay image -->
+    <section class="video-section relative overflow-hidden">
+      <h3>How to Apply First Aid</h3>
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+      >
+        <source src="https://cdn.videvo.net/videvo_files/video/free/2019-11/small_watermarked/191011_04_VariousRunning_1080p_30fps_42_1_preview.webm" type="video/webm" />
+        <source src="https://cdn.videvo.net/videvo_files/video/free/2019-11/small_watermarked/191011_04_VariousRunning_1080p_30fps_42_1_preview.mp4" type="video/mp4" />
+        Sorry, your browser doesn't support embedded videos.
+      </video>
+      <!-- Overlay image -->
+      <img
+        src="image.png"
+        alt="First Aid Medical"
+        class="video-overlay"
+        title="How to Apply First Aid"
+      />
+    </section>
+
+    <!-- Features with Images -->
+    <section class="cards-container">
+      <h3 class="col-span-full">Our Tools</h3>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Immediate First Aid" />
+        <h4>Immediate First Aid</h4>
+        <p>Step-by-step emergency guides for quick and effective response.</p>
+      </div>
+     
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Quick Checkup" />
+        <h4>Quick Symptom Check</h4>
+        <p>Fast recommendations based on your selected symptoms.</p>
+      </div>
+      <div class="card">
+        <img src="Screenshot 2025-06-28 122904.png" alt="Treatments" />
+        <h4>Treatments Overview</h4>
+        <p>Extensive care methods to manage injuries and illnesses effectively.</p>
+      </div>
+      <div class="card">
+        <img src="Screenshot 2025-06-28 122827.png" alt="Medicines" />
+        <h4>Medicines Info</h4>
+        <p>Reliable medicine data with dosage, usage, and safety tips.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container mx-auto px-6 text-center">
+      <p>&copy; 2025 First Aid Treatment. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Change header style on scroll
+    window.addEventListener("scroll", () => {
+      const header = document.getElementById("header");
+      if (window.scrollY > 50) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    });
+  </script>
+</body>
+</html>
